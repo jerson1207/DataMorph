@@ -11,8 +11,6 @@ require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Load SimpleCov first
-require 'simplecov'
-SimpleCov.start unless ENV['CI']  # ✅ Runs SimpleCov locally, but not in CI
 
 
 # Requires supporting ruby files with custom matchers and macros, etc, in

@@ -6,12 +6,8 @@ on:
     branches: [ main ]
 
 jobs:
-  ci:
-    name: Run CI
+  scan_ruby:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        job: [scan_ruby, lint, test]
 
     steps:
       - name: Checkout code
@@ -20,27 +16,49 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.3.0 
+          ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Install dependencies
-        run: bundle install
-
-      - name: Scan for vulnerabilities
-        if: matrix.job == 'scan_ruby'
+      - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
 
-      - name: Lint code
-        if: matrix.job == 'lint'
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Lint code for consistent style
         run: bin/rubocop -f github
 
-      - name: Set up Database
-        if: matrix.job == 'test'
-        env:
-          RAILS_ENV: test
-        run: bin/rails db:reset --trace
+  test:
+    runs-on: ubuntu-latest
 
-      - name: Run RSpec
-        env:
-          CI: true 
-        run: bundle exec rspec
+    env:
+      RAILS_ENV: test
+      BUNDLE_JOBS: 4
+      BUNDLE_RETRY: 3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: Set up database
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:migrate
+          bundle exec rails db:test:prepare
+
+      - name: Run RSpec tests
+        run: bundle exec rspec --format documentation
