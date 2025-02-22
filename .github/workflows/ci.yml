@@ -6,8 +6,12 @@ on:
     branches: [ main ]
 
 jobs:
-  scan_ruby:
+  ci:
+    name: Run CI
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        job: [scan_ruby, lint, test]
 
     steps:
       - name: Checkout code
@@ -16,50 +20,26 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: .ruby-version
-          bundler-cache: true
-
-      - name: Scan for common Rails security vulnerabilities using static analysis
-        run: bin/brakeman --no-pager
-
-      - name: Run RSpec
-        run: bundle exec rspec
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-          bundler-cache: true
-
-      - name: Lint code for consistent style
-        run: bin/rubocop -f github
-
-  test:  # ✅ Properly placed inside 'jobs'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
+          ruby-version: 3.3.0 
           bundler-cache: true
 
       - name: Install dependencies
         run: bundle install
 
+      - name: Scan for vulnerabilities
+        if: matrix.job == 'scan_ruby'
+        run: bin/brakeman --no-pager
+
+      - name: Lint code
+        if: matrix.job == 'lint'
+        run: bin/rubocop -f github
+
       - name: Set up Database
+        if: matrix.job == 'test'
         env:
           RAILS_ENV: test
         run: bin/rails db:create db:migrate --trace
 
       - name: Run RSpec
+        if: matrix.job == 'test'
         run: bundle exec rspec
