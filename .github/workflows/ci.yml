@@ -49,7 +49,12 @@ test:
           ruby-version: .ruby-version
           bundler-cache: true
 
+      - name: Install dependencies
+        run: bundle install
+
       - name: Set up Database
+        env:
+          RAILS_ENV: test
         run: bin/rails db:create db:migrate --trace
 
       - name: Run RSpec with SimpleCov
