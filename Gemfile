@@ -51,10 +51,17 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  gem 'rspec-rails'         # RSpec for testing
+  gem 'factory_bot_rails'   # FactoryBot for test data
+  gem 'shoulda-matchers'    # Simplifies model testing
+  gem 'faker'               # Generates fake data
+  gem 'database_cleaner-active_record' # Ensures a clean test database
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  gem "simplecov", require: false
 end
 
