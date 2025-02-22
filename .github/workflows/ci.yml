@@ -38,8 +38,9 @@ jobs:
         if: matrix.job == 'test'
         env:
           RAILS_ENV: test
-        run: bin/rails db:create db:migrate --trace
+        run: bin/rails db:reset --trace
 
       - name: Run RSpec
-        if: matrix.job == 'test'
+        env:
+          CI: true 
         run: bundle exec rspec
