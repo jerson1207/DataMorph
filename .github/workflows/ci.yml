@@ -55,6 +55,9 @@ jobs:
           gem install bundler
           bundle install --jobs 4 --retry 3
 
+      - name: Precompile Assets
+        run: bin/rails assets:precompile
+
       - name: Set up database
         run: |
           mkdir -p storage
