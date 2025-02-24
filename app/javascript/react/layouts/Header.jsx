@@ -112,8 +112,7 @@ function Header() {
         </button>
       </div>
 
-{/* Modal for Settings */}
-<Modal isOpen={isModalOpen} closeModal={closeModal}>
+      <Modal isOpen={isModalOpen} closeModal={closeModal}>
         <h2 className="text-xl font-semibold">Settings</h2>
         <div className="mt-4">
           <p>Select your subscription type:</p>

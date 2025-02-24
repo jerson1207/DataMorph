@@ -1,24 +1,21 @@
-// src/pages/HomePage.js
-import React, { useEffect } from 'react';
-import { useSubscription } from '../contexts/SubscriptionContext';
+import React from 'react';
 import SubscriptionDatePicker from '../components/SubscriptionDatePicker';
+import { useDateFilter } from '../contexts/DateFilterContext'; // Import the hook
 
 function HomePage() {
-  const { subscriptionType, startDate, endDate, updateSubscription } = useSubscription();
-
-  useEffect(() => {
-    // Optional: Set default values or load data if needed
-    if (!startDate) {
-      // Set default start date (could be today or a specific date)
-      const today = new Date();
-      updateSubscription(subscriptionType, today, null);
-    }
-  }, [subscriptionType, startDate, updateSubscription]);
+  const { startDate, endDate} = useDateFilter(); // Access date filter context
 
   return (
     <div className="container mx-auto p-2">
-      <div className="">
-        <SubscriptionDatePicker />
+      <div>
+        <SubscriptionDatePicker
+        />
+      </div>
+
+      {/* Render the startDate and endDate in a readable format */}
+      <div>
+        <p>Start date: {startDate.format('MM/DD/YYYY')}</p>
+        <p>End date: {endDate.format('MM/DD/YYYY')}</p>
       </div>
     </div>
   );

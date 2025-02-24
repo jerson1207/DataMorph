@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  if Rails.env.development?
+    mount GraphiQL::Rails::Engine, at: "/graphiql", graphql_path: "/graphql"
+  end
+  post "/graphql", to: "graphql#execute"
   root "pages#home"
   get "*path", to: "pages#home", constraints: ->(req) { !req.xhr? && req.format.html? }
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

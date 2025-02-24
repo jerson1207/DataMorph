@@ -1,10 +1,10 @@
-import React from 'react';
-import { useSubscription } from '../contexts/SubscriptionContext';
+import React, { useState } from 'react';
+import { useDateFilter } from '../contexts/DateFilterContext';
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from 'dayjs';
+import { useSubscription } from '../contexts/SubscriptionContext';
 
-const DatePickerWrapper = ({ label, value, minDate, maxDate, views }) => (
+const DatePickerWrapper = ({ label, value, minDate, maxDate, views, onChange }) => (
   <LocalizationProvider dateAdapter={AdapterDayjs}>
     <div className="flex justify-end w-full mb-2">
       <div className="flex gap-2">
@@ -14,6 +14,7 @@ const DatePickerWrapper = ({ label, value, minDate, maxDate, views }) => (
           views={views}
           minDate={minDate}
           maxDate={maxDate}
+          onChange={onChange}
           slotProps={{ textField: { size: "small" } }}
         />
       </div>
@@ -22,9 +23,22 @@ const DatePickerWrapper = ({ label, value, minDate, maxDate, views }) => (
 );
 
 export default function SubscriptionDatePicker() {
-  const { subscriptionType } = useSubscription();
-  const startDate = dayjs(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-  const endDate = dayjs(); // Current date as Dayjs object
+  const { startDate, endDate, setStartDate, setEndDate } = useDateFilter(); // Get date context
+  const { subscriptionType } = useSubscription(); 
+
+  const handleMonthly = (date) => {
+    const startMonth = date.startOf('month');
+    const endMonth = date.endOf('month');
+    setStartDate(startMonth);
+    setEndDate(endMonth);
+  };
+
+  const handleYearly = (date) => {
+    const startMonth = date.startOf('year');
+    const endMonth = date.endOf('year');
+    setStartDate(startMonth);
+    setEndDate(endMonth);
+  }
 
   return (
     <div>
@@ -32,8 +46,8 @@ export default function SubscriptionDatePicker() {
         <DatePickerWrapper
           label="Start Date"
           value={startDate}
-          maxDate={endDate}
           views={['year', 'month']}
+          onChange={handleMonthly}
         />
       }
 
@@ -43,6 +57,7 @@ export default function SubscriptionDatePicker() {
           value={startDate}
           maxDate={endDate}
           views={['year']}
+          onChange={handleYearly}
         />
       }
 
@@ -53,11 +68,13 @@ export default function SubscriptionDatePicker() {
               label="Start Date"
               value={startDate}
               maxDate={endDate}
+              onChange={setStartDate}
             />
             <DatePickerWrapper
               label="End Date"
               value={endDate}
               minDate={startDate}
+              onChange={setEndDate}
             />
           </div>
         </div>

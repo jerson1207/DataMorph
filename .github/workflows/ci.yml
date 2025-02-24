@@ -40,25 +40,26 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    env:
-      RAILS_ENV: test
-      BUNDLE_JOBS: 4
-      BUNDLE_RETRY: 3
-
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
+    
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
+          bundler-cache: true
 
       - name: Install dependencies
         run: |
           gem install bundler
-          bundle install
+          bundle install --jobs 4 --retry 3
 
       - name: Set up database
         run: |
-          bundle exec rails db:create
-          bundle exec rails db:migrate
-          bundle exec rails db:test:prepare
+          mkdir -p storage
+          bin/rails db:test:prepare
 
       - name: Run RSpec tests
-        run: bundle exec rspec --format documentation
+        run: bundle exec rspec
+

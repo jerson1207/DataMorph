@@ -65,3 +65,5 @@ group :development do
   # gem "simplecov", require: false
 end
 gem "propshaft"
+gem 'graphql'
+gem "graphiql-rails", group: :development
